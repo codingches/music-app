@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player App</title>
+    <style>
+        /* General Styles */
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: #1a1a2e;
+    color: #fff;
+}
+
+h1, h2, p {
+    margin: 0;
+}
+
+/* Header */
+header {
+    text-align: center;
+    background: #16213e;
+    padding: 20px 0;
+    font-size: 24px;
+}
+
+/* Search Bar */
+.search-bar {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.search-bar input {
+    padding: 10px;
+    font-size: 16px;
+    width: 70%;
+    border-radius: 5px;
+    border: none;
+}
+
+.search-bar button {
+    padding: 10px;
+    font-size: 18px;
+    background: #e94560;
+    color: #fff;
+    border: none;
+    margin-left: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.search-bar button:hover {
+    background: #ff5964;
+}
+
+/* Search Results */
+.search-results {
+    margin: 20px auto;
+    max-width: 800px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+}
+
+.search-results div {
+    background: #16213e;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+    width: 150px;
+    transition: transform 0.2s;
+}
+
+.search-results div:hover {
+    transform: scale(1.05);
+    background: #0f3460;
+}
+
+.search-results img {
+    width: 100px;
+    height: 100px;
+    border-radius: 5px;
+}
+
+.search-results span {
+    display: block;
+    margin-top: 5px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Music Player */
+.music-player {
+    text-align: center;
+    padding: 20px;
+    background: #5980ed;
+    margin: 20px;
+    border-radius: 10px;
+}
+
+.album-art img {
+    width: 150px;
+    height: 150px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.song-info h2 {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.controls button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    margin: 0 10px;
+    cursor: pointer;
+}
+
+.controls button:hover {
+    color: #e94560;
+}
+
+    </style>
+    <script src="https://kit.fontawesome.com/04f2172245.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>🎵 My Music Player</h1>
+        </header>
+
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Search for a song or artist...">
+            <button id="search-btn"><i class="fa-solid fa-search"></i></button>
+        </div>
+
+        <!-- Search Results -->
+        <div id="search-results" class="search-results"></div>
+
+        <!-- Music Player Section -->
+        <div class="music-player">
+            <div class="album-art">
+                <img src="tools/468-thumbnail.png" id="album-cover" alt="Album Cover">
+            </div>
+            <div class="song-info">
+                <h2 id="song-title">No Song Playing</h2>
+                <p id="artist-name">-</p>
+            </div>
+
+            <audio id="audio-player">
+                <source id="audio-source" src="">
+            </audio>
+
+            <!-- Player Controls -->
+            <div class="controls">
+                <button id="prev-btn"><i class="fa-solid fa-backward"></i></button>
+                <button id="play-pause-btn"><i class="fa-solid fa-play" id="play-pause-icon"></i></button>
+                <button id="next-btn"><i class="fa-solid fa-forward"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+const searchInput = document.getElementById("search-input");
+const searchResults = document.getElementById("search-results");
+const songTitle = document.getElementById("song-title");
+const artistName = document.getElementById("artist-name");
+const albumCover = document.getElementById("album-cover");
+const audioPlayer = document.getElementById("audio-player");
+const audioSource = document.getElementById("audio-source");
+const playPauseIcon = document.getElementById("play-pause-icon");
+const searchButton = document.getElementById("search-btn");
+const prevButton = document.getElementById("prev-btn");
+const nextButton = document.getElementById("next-btn");
+
+// Deezer API Key
+const API_KEY = "7d1e3e934emsh39eb39fedd1d8bap15bc77jsnec2b93f80320";
+
+// Current Song Queue
+let currentQueue = [];
+let currentIndex = 0;
+
+// Search Songs
+searchButton.addEventListener("click", async () => {
+    const query = searchInput.value.trim();
+    if (!query) {
+        alert("Please enter a search term!");
+        return;
+    }
+
+    try {
+        const response = await fetch(`https://deezerdevs-deezer.p.rapidapi.com/search?q=${query}`, {
+            method: "GET",
+            headers: {
+                "X-RapidAPI-Key": API_KEY,
+                "X-RapidAPI-Host": "deezerdevs-deezer.p.rapidapi.com",
+            },
+        });
+        const data = await response.json();
+        displaySearchResults(data.data);
+        currentQueue = data.data; // Update queue
+        currentIndex = 0; // Reset index
+    } catch (error) {
+        alert("An error occurred while fetching data. Please try again.");
+        console.error(error);
+    }
+});
+
+// Display Search Results
+function displaySearchResults(results) {
+    searchResults.innerHTML = ""; // Clear previous results
+    results.forEach((song) => {
+        const resultDiv = document.createElement("div");
+        resultDiv.innerHTML = `
+            <img src="${song.album.cover_small}" alt="Album Art">
+            <span>${song.title} - ${song.artist.name}</span>
+        `;
+        resultDiv.onclick = () => playSong(song);
+        searchResults.appendChild(resultDiv);
+    });
+}
+
+// Play Selected Song
+function playSong(song) {
+    songTitle.textContent = song.title;
+    artistName.textContent = song.artist.name;
+    albumCover.src = song.album.cover_medium;
+    audioSource.src = song.preview;
+    audioPlayer.load();
+    audioPlayer.play();
+    playPauseIcon.classList.replace("fa-play", "fa-pause");
+}
+
+// Play Next Song
+nextButton.addEventListener("click", () => {
+    if (currentQueue.length > 0) {
+        currentIndex = (currentIndex + 1) % currentQueue.length;
+        playSong(currentQueue[currentIndex]);
+    }
+});
+
+// Play Previous Song
+prevButton.addEventListener("click", () => {
+    if (currentQueue.length > 0) {
+        currentIndex = (currentIndex - 1 + currentQueue.length) % currentQueue.length;
+        playSong(currentQueue[currentIndex]);
+    }
+});
+
+// Toggle Play/Pause
+document.getElementById("play-pause-btn").addEventListener("click", () => {
+    if (audioPlayer.paused) {
+        audioPlayer.play();
+        playPauseIcon.classList.replace("fa-play", "fa-pause");
+    } else {
+        audioPlayer.pause();
+        playPauseIcon.classList.replace("fa-pause", "fa-play");
+    }
+});
+
+    </script>
+</body>
+</html>

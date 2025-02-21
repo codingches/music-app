@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Enhanced</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://kit.fontawesome.com/04f2172245.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="music-player">
+            <!-- Navigation -->
+            <nav>
+                <div class="circle">
+                    <i class="fa-solid fa-angle-left"></i>
+                </div>
+                <div class="circle">
+                    <i class="fa-solid fa-bars"></i>
+                </div>
+            </nav>
+
+            <!-- Song Information -->
+            <div class="album-cover">
+                <img src="tools/468-thumbnail.png" alt="Album Cover" class="song-img">
+            </div>
+            <div class="song-info">
+                <h1>Lucid Dreams</h1>
+                <p>Juice WRLD</p>
+            </div>
+
+            <!-- Audio Controls -->
+            <div class="audio-controls">
+                <audio id="song">
+                    <source src="Juice-WRLD-Lucid-Dreams.mp3" type="audio/mpeg">
+                </audio>
+                <input type="range" value="0" id="progress">
+            </div>
+
+            <!-- Playback Controls -->
+            <div class="controls">
+                <div onclick="previousSong()"><i class="fa-solid fa-backward"></i></div>
+                <div onclick="playPause()"><i class="fa-solid fa-play" id="ctrlIcon"></i></div>
+                <div onclick="nextSong()"><i class="fa-solid fa-forward"></i></div>
+            </div>
+
+            <!-- Song Timer -->
+            <div class="timer">
+                <span id="current-time">0:00</span>
+                <span id="total-time">0:00</span>
+            </div>
+        </div>
+    </div>
+        <script>
+            let progress = document.getElementById("progress");
+let song = document.getElementById("song");
+let ctrlIcon = document.getElementById("ctrlIcon");
+let currentTimeDisplay = document.getElementById("current-time");
+let totalTimeDisplay = document.getElementById("total-time");
+
+// Array of Songs (Mock Data)
+const songs = [
+  {
+    title: "Lucid Dreams",
+    artist: "Juice WRLD",
+    source: "Juice-WRLD-Lucid-Dreams.mp3",
+    image: "tools/468-thumbnail.png",
+  },
+  {
+    title: "Blinding Lights",
+    artist: "The Weeknd",
+    source: "Blinding-Lights.mp3",
+    image: "tools/blinding-lights.png",
+  },
+  {
+    title: "Stay",
+    artist: "Justin Bieber & Kid Laroi",
+    source: "Stay.mp3",
+    image: "tools/stay.png",
+  },
+];
+
+let currentSongIndex = 0;
+
+// Load the initial song
+function loadSong(index) {
+  let songInfo = songs[index];
+  document.querySelector(".song-img").src = songInfo.image;
+  document.querySelector("h1").innerText = songInfo.title;
+  document.querySelector("p").innerText = songInfo.artist;
+  song.src = songInfo.source;
+
+  // Reset progress bar and timer
+  progress.value = 0;
+  currentTimeDisplay.textContent = "0:00";
+  song.onloadedmetadata = () => {
+    progress.max = song.duration;
+    totalTimeDisplay.textContent = formatTime(song.duration);
+  };
+}
+
+// Format time in minutes and seconds
+function formatTime(seconds) {
+  let mins = Math.floor(seconds / 60);
+  let secs = Math.floor(seconds % 60);
+  return `${mins}:${secs < 10 ? "0" + secs : secs}`;
+}
+
+// Play or Pause the song
+function playPause() {
+  if (ctrlIcon.classList.contains("fa-pause")) {
+    song.pause();
+    ctrlIcon.classList.remove("fa-pause");
+    ctrlIcon.classList.add("fa-play");
+  } else {
+    song.play();
+    ctrlIcon.classList.add("fa-pause");
+    ctrlIcon.classList.remove("fa-play");
+  }
+}
+
+// Update progress bar and current time display
+song.ontimeupdate = () => {
+  progress.value = song.currentTime;
+  currentTimeDisplay.textContent = formatTime(song.currentTime);
+};
+
+// Seek functionality
+progress.onchange = function () {
+  song.currentTime = progress.value;
+};
+
+// Move to the next song
+function nextSong() {
+  currentSongIndex = (currentSongIndex + 1) % songs.length; // Loop to the first song
+  loadSong(currentSongIndex);
+  song.play();
+  ctrlIcon.classList.add("fa-pause");
+  ctrlIcon.classList.remove("fa-play");
+}
+
+// Move to the previous song
+function previousSong() {
+  currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length; // Loop to the last song
+  loadSong(currentSongIndex);
+  song.play();
+  ctrlIcon.classList.add("fa-pause");
+  ctrlIcon.classList.remove("fa-play");
+}
+
+// Reset player when the song ends
+song.onended = nextSong;
+
+// Load the first song on page load
+loadSong(currentSongIndex);
+
+        </script>
+        
+</body>
+</html>

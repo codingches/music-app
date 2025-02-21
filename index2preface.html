@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="index2.css">
+    <script src="https://kit.fontawesome.com/04f2172245.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- nav -->
+         <nav>
+            <a href="#"><i class="fa-solid fa-house"></i></a>
+            <a href="#"><i class="fa-solid fa-music"></i></a>
+            <a href="#"><i class="fa-solid fa-book"></i></a>
+            <a href="#"><i class="fa-solid fa-gear"></i></a>
+            <h1 class="text">Live Your Worries out With Music</h1>
+            <img src="tools/468-thumbnail.png" class="image-icon">
+         </nav>
+         <div class="section_one">
+            <h1>
+                Welcome
+            </h1>
+           <p><a href="index2.html"> Listen To Pop,Afro-beats,Regee,Jazz,Gospel Music and all other forms of Music</a></p>
+                 
+            </div>
+            <!--  -->
+    <div class="section_two" onmouseover="divChangerFunction()">
+        <div class="flex_one"><img src="tools/468-thumbnail.png">
+            <div>
+            <small>
+                <a href="index2.html">
+                Edshearen
+            </a>
+            </small>
+        </div>
+        </div>
+        <div class="flex_one"><img src="tools/468-thumbnail.png">
+            <div>
+            <small>
+                <a href="index2.html">Edshearen
+                </a>
+                </small>
+        </div>
+        </div>
+        <div class="flex_one"><img src="tools/468-thumbnail.png">
+            <div>
+            <small>
+                <a href="index2.html">Edshearen
+                </a>
+                </small>
+        </div>
+        </div>
+        <div class="flex_one"><img src="tools/468-thumbnail.png">
+            <div>
+            <small>
+                <a href="index2.html">Edshearen
+                </a>
+                </small>
+        </div>
+        </div>
+    </div>
+    </div>
+    <!-- first section -->
+    <script>
+window.onload = function() {
+    const text = document.querySelector('.text');
+    text.style.animation = 'slideIn 1s forwards'; // Starts the animation on page load
+};
+let divChanger = document.querySelector('.section_two');
+    function divChangerFunction() {
+        divChanger.style.backgroundColor = 'orange';
+        
+    }
+</script>
+</body>
+</html>
